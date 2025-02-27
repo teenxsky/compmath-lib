@@ -14,11 +14,11 @@ setup(
     long_description_content_type="text/markdown",
     author="Ruslan Kutorgin",
     author_email="kutorgin2002@gmail.com",
-    # url="https://github.com/kfurjan/python-freegeoip-client",
-    # project_urls={
-    #     "GitHub Project": "https://github.com/kfurjan/python-freegeoip-client",
-    #     "Issue Tracker": "https://github.com/kfurjan/python-freegeoip-client/issues",
-    # },
+    url="https://github.com/teenxsky/compmath-lib",
+    project_urls={
+        "GitHub Project": "https://github.com/teenxsky/compmath-lib",
+        "Issue Tracker": "https://github.com/teenxsky/compmath-lib/issues",
+    },
     packages=find_packages(
         include=["compmath"],
     ),
