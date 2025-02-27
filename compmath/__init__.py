@@ -1,5 +1,4 @@
-"""
-CompMath (Computational Mathematics) - Library for complex mathematical calculations
+""" CompMath (Computational Mathematics) - Library for complex mathematical calculations
 
 This library provides tools to perform calculations in the field
 computing mathematics, including numerical methods, linear algebra,
