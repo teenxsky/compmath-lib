@@ -1,6 +1,6 @@
 import numpy as np
 import sympy as sp
-from typing import Tuple, Callable
+from typing import Callable, Union
 from decimal import Decimal, getcontext
 
 
@@ -12,181 +12,103 @@ class __LagrangeInterpolation:
     Class for performing Lagrange interpolation.
     """
 
+    @staticmethod
     def interpolate(
-        self,
-        x: Decimal,
-        x0: Decimal,
-        y0: Decimal,
-        x1: Decimal,
-        y1: Decimal,
-        x2: Decimal = None,
-        y2: Decimal = None,
-        degree: int = 1,
+        x: Union[Decimal, float, int, str],
+        x_points: np.ndarray,
+        y_points: np.ndarray,
     ) -> Decimal:
         """
-        Performs Lagrange interpolation first or second degree (default first degree).
+        Performs Lagrange interpolation to estimate the value of a function at a given point `x` based on a set of known data points `(x_points, y_points)`.
+
+        The Lagrange interpolation formula is given by:
+            L_n(x) = Σ (y_i * l_i(x)) for i = 0 to n-1
+        where:
+            l_i(x) = Π ((x - x_j) / (x_i - x_j)) for j = 0 to n-1, j ≠ i
 
         Args:
-            x (Decimal): The x-coordinate at which to interpolate.
-            x0 (Decimal): The first x-coordinate.
-            y0 (Decimal): The first y-coordinate.
-            x1 (Decimal): The second x-coordinate.
-            y1 (Decimal): The second y-coordinate.
-            x2 (Decimal, optional): The third x-coordinate. Defaults to None. But if degree = 2, it should be provided.
-            y2 (Decimal, optional): The third y-coordinate. Defaults to None. But if degree = 2, it should be provided.
-            degree (int, optional): The degree of the interpolating polynomial. If degree = 1 then Linear, if degree = 2 then Quadratic. Defaults to 1.
+            x (Union[Decimal, float, int, str]): The x-coordinate at which to interpolate.
+            x_points (np.ndarray): An array of x-coordinates used for interpolation.
+            y_points (np.ndarray): An array of y-coordinates corresponding to x_points.
 
         Raises:
-            ValueError: If degree is not supported or missing points for quadratic interpolation.
+            ValueError: If the number of x_points and y_points do not match or if less than two points are provided.
 
         Returns:
             Decimal: The interpolated y-coordinate.
         """
-        if degree == 1:
-            return self.__linear(x, x0, y0, x1, y1)
-        elif degree == 2 and x2 and y2:
-            return self.__quad(x, x0, y0, x1, y1, x2, y2)
-        else:
+        if len(x_points) < 2 or len(x_points) != len(y_points):
             raise ValueError(
-                "Unsupported degree or missing points for quadratic interpolation."
+                "x_points and y_points must have at least two elements and be of the same length."
             )
 
-    def __linear(
-        self, x: Decimal, x0: Decimal, y0: Decimal, x1: Decimal, y1: Decimal
-    ) -> Decimal:
-        """
-        Performs linear interpolation using Lagrange's method.
+        L_n = Decimal("0")
+        x = Decimal(str(x))
+        x_points = np.array([Decimal(str(x)) for x in x_points], dtype=Decimal)
+        y_points = np.array([Decimal(str(y)) for y in y_points], dtype=Decimal)
 
-        Args:
-            x (Decimal): The x-coordinate at which to interpolate.
-            x0 (Decimal): The first x-coordinate.
-            y0 (Decimal): The first y-coordinate.
-            x1 (Decimal): The second x-coordinate.
-            y1 (Decimal): The second y-coordinate.
+        for i in range(len(x_points)):
+            l_i = Decimal("1")
+            for j in range(len(x_points)):
+                if i != j:
+                    l_i *= (x - x_points[j]) / (x_points[i] - x_points[j])
+            L_n += y_points[i] * l_i
 
-        Returns:
-            Decimal: The interpolated y-coordinate.
-        """
-        return y0 * (x - x1) / (x0 - x1) + y1 * (x - x0) / (x1 - x0)
+        return L_n
 
-    def __quad(
-        self,
-        x: Decimal,
-        x0: Decimal,
-        y0: Decimal,
-        x1: Decimal,
-        y1: Decimal,
-        x2: Decimal,
-        y2: Decimal,
-    ) -> Decimal:
-        """
-        Performs quadratic interpolation using Lagrange's method.
-
-        Args:
-            x (Decimal): The x-coordinate at which to interpolate (in Lagrange's formula is x*).
-            x0 (Decimal): The first x-coordinate (in Lagrange's formula is x_{i-1}).
-            y0 (Decimal): The first y-coordinate (in Lagrange's formula is f(x_{i-1}) ).
-            x1 (Decimal): The second x-coordinate (in Lagrange's formula is x_{i}).
-            y1 (Decimal): The second y-coordinate (in Lagrange's formula is f(x_{i}) ).
-            x2 (Decimal): The third x-coordinate (in Lagrange's formula is x_{i+1}).
-            y2 (Decimal): The third y-coordinate (in Lagrange's formula is f(x_{i+1}) ).
-
-        Returns:
-            Decimal: The interpolated y-coordinate.
-        """
-        term1 = y0 * (x - x1) * (x - x2) / ((x0 - x1) * (x0 - x2))
-        term2 = y1 * (x - x0) * (x - x2) / ((x1 - x0) * (x1 - x2))
-        term3 = y2 * (x - x0) * (x - x1) / ((x2 - x0) * (x2 - x1))
-        return term1 + term2 + term3
-
+    @staticmethod
     def est_rem(
-        self,
-        x: Decimal,
-        f: Callable[[sp.Symbol], sp.Basic],
-        interval: Tuple[Decimal, Decimal],
-        mid: Decimal = None,
-        degree: int = 1,
+        x: Union[Decimal, float, int, str],
+        nodes: np.ndarray,
+        derivative_x: Union[Decimal, float, int, str] = None,
+        f: Callable[[sp.Symbol], sp.Basic] = None,
         func_sym: str = "x",
     ) -> Decimal:
         """
-        Estimates the remainder term of the Lagrange interpolation using symbolic computation.
+        Estimate the remainder term of the Lagrange interpolation polynomial.
+
+        This function calculates the remainder term of the Lagrange interpolation polynomial for a given set of nodes and a function or its derivative. It uses either the provided (n+1)-th derivative value or computes it symbolically if a function is provided.
 
         Args:
-            x (Decimal): The x-coordinate at which to estimate the remainder.
-            f (Callable[[sp.Symbol], sp.Basic]): A sympy-compatible function representing the function being interpolated. The function should use sympy symbols for its definition.
-            interval (Tuple[Decimal, Decimal]): The interval over which to estimate the remainder [a, b].
-            mid (Decimal, optional): The midpoint of the interval for quadratic interpolation. Defaults to None, but if degree = 2, it should be provided.
-            degree (int): The degree of the interpolating polynomial. If Linear, degree = 1; if Quadratic, degree = 2.
+            x (Union[Decimal, float, int, str]): The x-coordinate at which to estimate the remainder.
+            nodes (np.ndarray): An array of interpolation nodes.
+            derivative_x (Union[Decimal, float, int, str], optional): The value of the (n+1)-th derivative at `x`. Defaults to None. Will be computed if `f` is provided.
+            f (Callable[[sp.Symbol], sp.Basic], optional): A sympy-compatible function representing the function being interpolated. Defaults to None. If `derivative_x` is not provided, this function must be provided.
             func_sym (str, optional): The symbolic variable name to be used in the sympy function. Defaults to "x".
 
-        Raises:
-            ValueError: If the degree is not supported or if the midpoint is missing for quadratic interpolation.
-
         Returns:
-            Decimal: The estimated remainder term.
+            Decimal: The estimated remainder term of the Lagrange interpolation polynomial.
+
+        Raises:
+            ValueError: If the (n+1)-th derivative of the function cannot be computed or if neither `f` nor `derivative_x` is provided.
         """
+        x = Decimal(str(x))
+        nodes = np.array([Decimal(str(node)) for node in nodes], dtype=Decimal)
 
-        a, b = interval
-        step = (b - a) / Decimal("10")
-        points = [a + step * i for i in range(11)]
+        n = len(nodes) - 1
 
-        x_sym = sp.symbols(func_sym)
-        f_sym = f(x_sym)
+        if derivative_x is None:
+            x_sym = sp.symbols(func_sym)
+            try:
+                f_derivative = sp.diff(f(x_sym), x_sym, n + 1)
+            except Exception:
+                raise ValueError(
+                    f"Failed to compute the {n + 1}-th derivative of the function"
+                )
 
-        if degree == 1:
-            f_derivative = sp.diff(f_sym, x_sym, 2)
-            f_derivative_func = sp.lambdify(x_sym, f_derivative, "numpy")
-            derivatives = [f_derivative_func(float(p)) for p in points]
-            min_deriv = Decimal(min(derivatives))
-            max_deriv = Decimal(max(derivatives))
-
-            omega_val = self.__omega_linear(x, (a, b))
-            return omega_val / Decimal("2") * (min_deriv + max_deriv) / Decimal("2")
-        elif degree == 2 and mid:
-            f_derivative = sp.diff(f_sym, x_sym, 3)
-            f_derivative_func = sp.lambdify(x_sym, f_derivative, "numpy")
-            derivatives = [f_derivative_func(float(p)) for p in points]
-            min_deriv = Decimal(min(derivatives))
-            max_deriv = Decimal(max(derivatives))
-
-            mid = (a + b) / 2
-            omega_val = self.__omega_quad(x, (a, b), mid)
-            return omega_val / Decimal("6") * (min_deriv + max_deriv) / Decimal("2")
-        else:
+            derivative_x = f_derivative.evalf(subs={x_sym: x})
+        elif f is None:
             raise ValueError(
-                "Unsupported degree or missing mid point for quadratic interpolation (with degree = 2)."
+                "Either f or derivative_x must be provided to estimate the remainder."
             )
 
-    def __omega_linear(self, x: Decimal, interval: Tuple[Decimal, Decimal]) -> Decimal:
-        """
-        Auxiliary function for the linear remainder term.
+        omega_x = Decimal("1")
+        for x_i in nodes:
+            omega_x *= x - x_i
 
-        Args:
-            x (Decimal): The x-coordinate at which to evaluate.
-            interval (Tuple[Decimal, Decimal]): The interval over which to evaluate [a, b].
+        factorial = Decimal(str(np.prod([i for i in range(1, n + 2)])))
 
-        Returns:
-            Decimal: The value of the omega function.
-        """
-        x_i1, x_i2 = interval
-        return (x - x_i1) * (x - x_i2)
-
-    def __omega_quad(
-        self, x: Decimal, interval: Tuple[Decimal, Decimal], mid: Decimal
-    ) -> Decimal:
-        """
-        Auxiliary function for the quadratic remainder term.
-
-        Args:
-            x (Decimal): The x-coordinate at which to evaluate.
-            interval (Tuple[Decimal, Decimal]): The interval over which to evaluate [a, b].
-            mid (Decimal): The midpoint of the interval.
-
-        Returns:
-            Decimal: The value of the omega function.
-        """
-        x_i1, x_i2 = interval
-        return (x - x_i1) * (x - mid) * (x - x_i2)
+        return derivative_x / factorial * omega_x
 
 
 class __NewtonInterpolation:
@@ -194,117 +116,95 @@ class __NewtonInterpolation:
     Class for performing Newton interpolation with recursive methods.
     """
 
-    @staticmethod
     def interpolate(
-        table: np.ndarray, x_nodes: np.ndarray, x: Decimal, degree: int
-    ) -> Decimal:
+        self,
+        x: Decimal,
+        x_points: np.ndarray,
+        y_points: np.ndarray,
+        dd_table: np.ndarray = None,
+    ):
         """
-        Performs interpolation using Newton's method with recursive helper.
+        Interpolates the value of a function at a given point `x` using the Newton's divided differences method.
 
-        Args:
-            table (np.ndarray): The table of divided differences.
-            x_nodes (np.ndarray): The list of x-coordinates.
-            x (Decimal): The x-coordinate at which to interpolate.
-            degree (int): The degree of the interpolating polynomial.
+        The interpolation is based on the provided x_points and y_points, which represent the known data points.
+        Optionally, a precomputed divided differences table (`dd_table`) can be provided to optimize the computation.
+
+        The interpolation formula used is:
+            P(x) = f[x0] + f[x0, x1](x - x0) + f[x0, x1, x2](x - x0)(x - x1) + ... + f[x0, x1, ..., xn](x - x0)(x - x1)...(x - xn-1)
+
+        Where:
+            - f[x0], f[x0, x1], ..., f[x0, x1, ..., xn] are the divided differences.
+            - x0, x1, ..., xn are the x_points.
+
+        Parameters:
+            x (Decimal): The point at which to interpolate the value.
+            x_points (np.ndarray): An array of x-coordinates of the known data points.
+            y_points (np.ndarray): An array of y-coordinates of the known data points.
+            dd_table (np.ndarray, optional): A precomputed divided differences table. Defaults to None.
 
         Returns:
-            Decimal: The interpolated y-coordinate.
+            Decimal: The interpolated value at the given point `x`.
+
+        Raises:
+            ValueError: If `dd_table` is provided but its length does not match the length of `y_points`.
         """
+        x = Decimal(str(x))
+        x_points = np.array([Decimal(str(x)) for x in x_points], dtype=Decimal)
+        y_points = np.array([Decimal(str(y)) for y in y_points], dtype=Decimal)
 
-        def recursive_interp(
-            current_degree: int, product: Decimal, result: Decimal
-        ) -> Decimal:
-            if current_degree > degree:
-                return result
-            else:
-                new_product = (
-                    product * (x - x_nodes[current_degree])
-                    if current_degree >= 0
-                    else product
-                )
-                new_result = result + (
-                    table[0][current_degree + 1] * new_product
-                    if current_degree >= 0
-                    else table[0][0]
-                )
-                return recursive_interp(current_degree + 1, new_product, new_result)
+        if dd_table is None:
+            table = self.dd(x_points, y_points)
+        else:
+            if len(dd_table) != len(y_points):
+                raise ValueError("dd_table must have the same length as y_points.")
 
-        return recursive_interp(0, Decimal("1"), table[0][0])
+        n = len(y_points)
+        result = Decimal(str(table[0, 0]))
 
-    @staticmethod
-    def dd(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        for i in range(1, n):
+            term = Decimal(str(table[0, i]))
+            for j in range(i):
+                term *= x - x_points[j]
+            result += term
+
+        return result
+
+    def dd(self, x_points: np.ndarray, y_points: np.ndarray) -> np.ndarray:
         """
-        Constructs a table of divided differences for Newton's interpolation.
+        Compute the divided differences table for a given set of points.
+
+        This method calculates the divided differences table, which is used in polynomial interpolation (e.g., Newton's interpolation).
+
+        The interpolation formula used is:
+
+            f[x_i, ..., x_{i+j}] = (f[x_{i+1}, ..., x_{i+j}] - f[x_i, ..., x_{i+j-1}]) / (x_{i+j} - x_i)
+
+        Where `f[x_i, ..., x_{i+j}]` represents the divided difference of order `j`.
 
         Args:
-            x (np.ndarray): The list of x-coordinates.
-            y (np.ndarray): The list of y-coordinates.
+            x_points (np.ndarray): A 1D array of x-coordinates of the data points.
+            y_points (np.ndarray): A 1D array of y-coordinates of the data points.
 
         Returns:
-            np.ndarray: The table of divided differences.
+            np.ndarray: A 2D array representing the divided differences table. The
+            first column contains the `y_points`, and the subsequent columns contain
+            the divided differences of increasing order.
         """
+        x_points = np.array([Decimal(str(x)) for x in x_points], dtype=Decimal)
+        y_points = np.array([Decimal(str(y)) for y in y_points], dtype=Decimal)
 
-        n = len(x)
-        table = [[Decimal("0") for _ in range(n)] for _ in range(n)]
+        n = len(y_points)
+        table = np.zeros([n, n])
 
-        for i in range(n):
-            table[i][0] = y[i]
+        table[:, 0] = y_points
 
         for j in range(1, n):
             for i in range(n - j):
-                table[i][j] = (table[i + 1][j - 1] - table[i][j - 1]) / (
-                    x[i + j] - x[i]
-                )
+                table[i, j] = (
+                    Decimal(str(table[i + 1, j - 1])) - Decimal(str(table[i, j - 1]))
+                ) / (x_points[i + j] - x_points[i])
 
         return table
-
-
-# class __NewtonInterpolation:
-#     """
-#     Class for performing Newton interpolation.
-#     """
-
-#     @staticmethod
-#     def interpolate(
-#         table: List[List[Decimal]], x_nodes: List[Decimal], x: Decimal, degree: int
-#     ) -> Decimal:
-#         """
-#         Performs interpolation using Newton's method.
-
-#         Args:
-#             table (List[List[Decimal]]): The table of divided differences.
-#             x_nodes (List[Decimal]): The list of x-coordinates.
-#             x (Decimal): The x-coordinate at which to interpolate.
-#             degree (int): The degree of the interpolating polynomial.
-
-#         Returns:
-#             Decimal: The interpolated y-coordinate.
-#         """
-#         result = table[0][0]
-#         product = Decimal("1")
-
-#         for i in range(1, degree + 1):
-#             product *= x - x_nodes[i - 1]
-#             result += table[0][i] * product
-
-#         return result
-
-#     @staticmethod
-#     def dd(x: List[Decimal], y: List[Decimal]) -> List[List[Decimal]]:
-
-#         n = len(x)
-#         table = [[Decimal("0") for _ in range(n)] for _ in range(n)]
-
-#         for i in range(n):
-#             table[i][0] = y[i]
-
-#         for j in range(1, n):
-#             for i in range(n - j):
-#                 table[i][j] = (table[i + 1][j - 1] - table[i][j - 1]) / (
-#                     x[i + j] - x[i]
-#                 )
-
-#         return table
 
 
 lagrange = __LagrangeInterpolation()
