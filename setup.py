@@ -25,9 +25,10 @@ setup(
     package_data={
         "compmath": ["src/"],
     },
-    # install_requires=[
-    #     "requests==2.27.1",
-    # ],
+    install_requires=[
+        "sympy==1.13.3",
+        "numpy==2.2.4",
+    ],
     # setup_requires=[
     #     "pytest-runner",
     #     "flake8==4.0.1",

@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from decimal import Decimal, getcontext
 from typing import Callable, Union, Optional
 
@@ -12,10 +13,10 @@ def absolute_error(
     """
     Calculates the absolute error in various ways:
 
-    1. If exact_value is provided - by definition (using the exact value)
-    2. If valid_digits is provided - by the number of valid digits
-    3. If rel_err is provided - from the relative error
-    4. If nothing is provided - calculates the absolute error for a relative error equal to five units of the next digit place
+        1. If exact_value is provided - by definition (using the exact value)
+        2. If valid_digits is provided - by the number of valid digits
+        3. If rel_err is provided - from the relative error
+        4. If nothing is provided - calculates the absolute error for a relative error equal to five units of the next digit place
 
     Args:
         value (Union[Decimal, float, int, str]): The approximate value.
@@ -79,10 +80,10 @@ def relative_error(
     """
     Calculates the relative error in various ways:
 
-    1. If exact_value is provided - by definition (using the exact value)
-    2. If valid_digits is provided - by the number of valid digits
-    3. If abs_err is provided - from the absolute error
-    4. If nothing is provided - calculates the relative error for an absolute error equal to five units of the next digit place
+        1. If exact_value is provided - by definition (using the exact value)
+        2. If valid_digits is provided - by the number of valid digits
+        3. If abs_err is provided - from the absolute error
+        4. If nothing is provided - calculates the relative error for an absolute error equal to five units of the next digit place
 
     Args:
         value (Union[Decimal, float, int, str]): The approximate value.
@@ -205,7 +206,7 @@ class __ConditionalNumbers:
         """
         getcontext().prec = precision
 
-    def absCondNumber(self) -> Decimal:
+    def abs(self) -> Decimal:
         """
         Calculates the absolute condition number using Decimal arithmetic.
 
@@ -214,7 +215,7 @@ class __ConditionalNumbers:
         """
         return abs((self._fXdX - self._fX) / self._dX)
 
-    def relativeCondNumber(self) -> Decimal:
+    def rel(self) -> Decimal:
         """
         Calculates the relative condition number using Decimal arithmetic.
 
@@ -240,17 +241,21 @@ class __DigitsAnalysis:
             value (Union[Decimal, float, int, str]): The number to be analyzed.
         """
         self._dec_number = Decimal(str(value))
-        self._int_part = str(self._dec_number).split(".")[0]
+        self._int_part = (
+            str(self._dec_number).split(".")[0][1:]
+            if self._dec_number < 0
+            else str(self._dec_number).split(".")[0]
+        )
         self._frac_part = (
             str(self._dec_number).split(".")[1] if "." in str(self._dec_number) else ""
         )
 
-    def sd(self) -> list[int]:
+    def sd(self) -> np.ndarray:
         """
         Returns the significant digits of the number.
 
         Returns:
-            list[int]: A list of significant digits.
+            np.ndarray: A list of significant digits.
         """
         str_num = (
             f"{self._int_part}.{self._frac_part}" if self._frac_part else self._int_part
@@ -258,7 +263,7 @@ class __DigitsAnalysis:
 
         return [int(digit) for digit in str_num.replace(".", "").lstrip("0")]
 
-    def vd(self, abs_err: Union[Decimal, float, int, str] = None) -> list[int]:
+    def vd(self, abs_err: Union[Decimal, float, int, str] = None) -> np.ndarray:
         """
         Finds the valid digits of the number based on the absolute error.
 
@@ -266,7 +271,7 @@ class __DigitsAnalysis:
             abs_err (Union[Decimal, float, int, str], optional): The absolute error. If not provided, it will be calculated (all numbers are considered significant).
 
         Returns:
-            list[int]: A list of valid digits.
+            np.ndarray: A list of valid digits.
         """
         if abs_err is None:
             abs_err = absolute_error(self._dec_number)
@@ -285,7 +290,7 @@ class __DigitsAnalysis:
 
         return valid_digits
 
-    def dd(self, abs_err: Union[Decimal, float, int, str] = None) -> list[int]:
+    def dd(self, abs_err: Union[Decimal, float, int, str] = None) -> np.ndarray:
         """
         Finds the doubtful digits of the number based on the absolute error.
 
@@ -293,7 +298,7 @@ class __DigitsAnalysis:
             abs_err (Union[Decimal, float, int, str], optional): The absolute error. If not provided, it will be calculated (all numbers are considered significant)
 
         Returns:
-            list[int]: A list of doubtful digits.
+            np.ndarray: A list of doubtful digits.
         """
         if abs_err is None:
             abs_err = absolute_error(self._dec_number)
@@ -329,7 +334,11 @@ class __RoundTo:
             value (float): Union[Decimal, float, int, str].
         """
         self._dec_number = Decimal(str(value))
-        self._int_part = str(self._dec_number).split(".")[0]
+        self._int_part = (
+            str(self._dec_number).split(".")[0][1:]
+            if self._dec_number < 0
+            else str(self._dec_number).split(".")[0]
+        )
         self._frac_part = (
             str(self._dec_number).split(".")[1] if "." in str(self._dec_number) else ""
         )
@@ -708,7 +717,7 @@ class ApproxNum:
     @property
     def abs_err(self) -> Decimal:
         return self._abs_err
-    
+
     @abs_err.setter
     def abs_err(self, value: Union[Decimal, float, int, str]) -> None:
         if isinstance(value, ApproxNum):
