@@ -9,7 +9,7 @@ def getLongDescription():
 setup(
     name="compmath",
     version="0.0.1",
-    description="Another library for complex mathematical calculations!",
+    description="One more library for mathematical calculations!",
     long_description=getLongDescription(),
     long_description_content_type="text/markdown",
     author="Ruslan Kutorgin",
@@ -23,11 +23,12 @@ setup(
         include=["compmath"],
     ),
     package_data={
-        "compmath": ["src/"],
+        "compmath": ["**/*.py"],
     },
-    # install_requires=[
-    #     "requests==2.27.1",
-    # ],
+    install_requires=[
+        "sympy==1.13.3",
+        "numpy==2.2.4",
+    ],
     # setup_requires=[
     #     "pytest-runner",
     #     "flake8==4.0.1",

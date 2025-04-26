@@ -13,14 +13,13 @@ Basic possibilities:
 
 Modules:
 - `math_errors`: a module for calculation errors.
+- `interpolation`: a module for interpolation methods.
 """
 
 import importlib as _importlib
 
 
-MODULES = [
-    "math_errors",
-]
+MODULES = ["math_errors", "interpolation"]
 
 
 def __getattr__(name):
