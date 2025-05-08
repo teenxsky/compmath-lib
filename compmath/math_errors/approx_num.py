@@ -5,6 +5,7 @@ from .errors import absolute_error, relative_error
 
 
 getcontext().prec = 20
+__all__ = ["ApproxNum"]
 
 
 class ApproxNum:

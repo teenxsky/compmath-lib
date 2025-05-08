@@ -6,6 +6,7 @@ from sympy import symbols, diff, Symbol, Basic
 
 
 getcontext().prec = 20
+__all__ = ["lagrange", "rem", "lagrange_deriv"]
 
 
 def lagrange(

@@ -3,6 +3,9 @@ from typing import Union
 from decimal import Decimal
 
 
+__all__ = ["to_decimal"]
+
+
 def to_decimal(
     obj: Union[float, int, str, list, np.ndarray],
 ) -> Union[Decimal, np.ndarray]:

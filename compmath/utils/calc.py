@@ -1,6 +1,9 @@
 import numpy as np
 
 
+__all__ = ["factorial"]
+
+
 def factorial(value: int) -> int:
     """
     Calculate the factorial of a given integer.

@@ -6,6 +6,7 @@ from ..utils import factorial, to_decimal
 
 
 getcontext().prec = 20
+__all__ = ["gauss"]
 
 
 class _Gauss:

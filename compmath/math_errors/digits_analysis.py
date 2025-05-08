@@ -4,6 +4,7 @@ from decimal import Decimal, getcontext
 
 
 getcontext().prec = 20
+__all__ = ["digits_analysis"]
 
 
 class __DigitsAnalysis:
