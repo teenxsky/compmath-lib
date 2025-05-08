@@ -11,6 +11,7 @@ This submodule includes implementations of various interpolation methods, such a
 - Newton interpolation (divided, forward, and backward differences)
 - Gauss interpolation (forward and backward)
 - Stirling and Bessel interpolation for equally spaced nodes
+- Cubic Hermite spline interpolation
 
 Each method is designed to handle specific use cases, such as unevenly spaced nodes, equally spaced nodes,
 or interpolation near the center of the data range.
@@ -36,6 +37,12 @@ Features:
   - Bessel interpolation for even numbers of intervals (odd number of points).
   - Designed for equally spaced nodes.
 
+- **Cubic Hermite Spline Interpolation**:
+  - Implemented via the `HSpline` class in the `spline` module.
+  - Constructs a smooth spline with continuous first derivatives.
+  - Supports evaluation of spline values, derivatives (1st to 3rd order), and definite integrals.
+  - Precision-friendly: works with `Decimal` for high-accuracy computations.
+
 - **Finite Difference Tables**:
   - Utility functions for generating finite difference tables used in Newton, Gauss, Stirling, and Bessel methods.
 
@@ -46,6 +53,7 @@ Modules:
 - `gauss_f`: Provides Gauss forward and backward interpolation methods.
 - `odd_even_f`: Implements Stirling and Bessel interpolation methods for equally spaced nodes.
 - `difftabs`: Utility functions for generating finite difference tables.
+- `spline`: Contains the `HSpline` class for cubic Hermite spline interpolation.
 
 Usage:
 ------
@@ -56,7 +64,7 @@ Example:
 --------
 ```python
 import numpy as np
-from compmath.interpolation import lagrange, newton, gauss, difftabs
+from compmath.interpolation import lagrange, newton, gauss, difftabs, HSpline
 
 # Define known data points
 xp = np.array([0, 1, 2, 3], dtype=float)
@@ -79,8 +87,14 @@ print(f"Gauss forward interpolation at x={x}: {y_gauss}")
 fd_table = difftabs.fin(yp)
 print("Finite difference table:")
 print(fd_table)
+
+# Cubic Hermite Spline interpolation
+spline = hspline(xp, yp)
+y_spline = spline.interpolate(x)
+print(f"Cubic spline interpolation at x={x}: {y_spline}")
 """
 
+from .splain import *
 from .gauss_f import *
 from .difftabs import *
 from .newton_f import *

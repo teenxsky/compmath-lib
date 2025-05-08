@@ -1,7 +1,7 @@
 import numpy as np
-from typing import Union, Literal
 from ..utils import to_decimal
 from .difftabs import difftabs
+from typing import Union, Literal
 from decimal import Decimal, getcontext
 
 
