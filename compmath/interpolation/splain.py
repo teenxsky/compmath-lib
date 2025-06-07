@@ -1,7 +1,10 @@
-import numpy as np
-from ..utils import to_decimal
-from typing import Union, Literal
 from decimal import Decimal, getcontext
+from typing import Literal, Union
+
+import numpy as np
+import sympy as sp
+
+from ..utils import to_decimal
 
 getcontext().prec = 20
 __all__ = ["hspline"]
@@ -91,7 +94,7 @@ class __HermiteSpline:
         self,
         x: Union[Decimal, float, int, str],
         return_type: Literal["Decimal", "float"] = "float",
-    ) -> Union[Decimal, np.ndarray]:
+    ) -> Union[Decimal, np.float64]:
         """
         Estimate the spline value at one or more query points.
 
@@ -149,23 +152,27 @@ class __HermiteSpline:
         Raises:
             ValueError: If the derivative order is not in [1, 2, 3].
         """
-        if order not in [1, 2, 3]:
-            raise ValueError("Only derivatives of order 1, 2, or 3 are supported.")
+        x_sym = sp.symbols("x")
+        expr = 0
 
-        x = to_decimal(np.atleast_1d(x))
-        result = np.zeros_like(x, dtype=Decimal)
+        for i in range(self.n - 1):
+            xi = float(self.xp[i])
+            x_next = float(self.xp[i + 1])
+            ai, bi, ci, di, _ = [float(c) for c in self.coeffs[i]]
 
-        for idx, x in enumerate(x):
-            i = np.clip(np.searchsorted(self.xp, x) - 1, 0, self.n - 2)
-            _, bi, ci, di, xi = self.coeffs[i]
-            dx = x - xi
+            dx = x_sym - xi
+            poly = ai + bi * dx + ci * dx**2 + di * dx**3
 
-            if order == 1:
-                result[idx] = bi + 2 * ci * dx + 3 * di * dx**2
-            elif order == 2:
-                result[idx] = 2 * ci + 6 * di * dx
-            else:
-                result[idx] = 6 * di
+            expr += sp.Piecewise((poly, (x_sym >= xi) & (x_sym <= x_next)), (0, True))
+
+        deriv_expr = sp.diff(expr, x_sym, order)
+
+        x_vals = np.atleast_1d(x)
+        result = np.zeros_like(x_vals, dtype=Decimal)
+
+        for i, x_val in enumerate(x_vals):
+            val = deriv_expr.subs(x_sym, float(x_val))
+            result[i] = to_decimal(val)
 
         return (
             to_decimal(result if len(result) > 1 else result[0])

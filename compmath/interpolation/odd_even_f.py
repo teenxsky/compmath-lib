@@ -1,12 +1,13 @@
+from decimal import Decimal, getcontext
+from typing import Literal, Union
+
 import numpy as np
+
 from ..utils import to_decimal
 from .difftabs import difftabs
-from typing import Union, Literal
-from decimal import Decimal, getcontext
-
 
 getcontext().prec = 20
-__all__ = ["stirling", "bessel"]
+__all__ = ['stirling', 'bessel']
 
 
 def stirling(
@@ -14,7 +15,7 @@ def stirling(
     xp: np.ndarray,
     yp: np.ndarray,
     fd: np.ndarray = None,
-    return_type: Literal["Decimal", "float"] = "float",
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Stirling interpolation for equally spaced nodes.
@@ -40,15 +41,17 @@ def stirling(
     yp = to_decimal(yp)
 
     if len(xp) != len(yp):
-        raise ValueError("xp and yp must be of equal length.")
+        raise ValueError('xp and yp must be of equal length.')
     if fd is None:
         fd = difftabs.fin(yp)
     elif len(fd) != len(yp):
-        raise ValueError("fd must have the same length as yp.")
+        raise ValueError('fd must have the same length as yp.')
 
     n = len(xp) - 1
     if (n + 1) % 2 == 0:
-        raise ValueError("Stirling method requires an even number of points (odd n).")
+        raise ValueError(
+            'Stirling method requires an even number of points (odd n).'
+        )
 
     m = n // 2
     h = xp[1] - xp[0]
@@ -71,7 +74,7 @@ def stirling(
 
         val += (t_prod * dk) / fact
 
-    return val if return_type == "Decimal" else np.float64(val)
+    return val if return_type == 'Decimal' else np.float64(val)
 
 
 def bessel(
@@ -79,7 +82,7 @@ def bessel(
     xp: np.ndarray,
     yp: np.ndarray,
     fd: np.ndarray = None,
-    return_type: Literal["Decimal", "float"] = "float",
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Bessel interpolation for equally spaced nodes.
@@ -105,14 +108,16 @@ def bessel(
 
     n = len(xp) - 1
     if (n + 1) % 2 == 1:
-        raise ValueError("Bessel method requires an even number of points (odd n).")
+        raise ValueError(
+            'Bessel method requires an even number of points (odd n).'
+        )
 
     if len(xp) != len(yp):
-        raise ValueError("xp and yp must be of equal length.")
+        raise ValueError('xp and yp must be of equal length.')
     if fd is None:
         fd = difftabs.fin(yp)
     elif len(fd) != len(yp):
-        raise ValueError("fd must have the same length as yp.")
+        raise ValueError('fd must have the same length as yp.')
 
     m = n // 2
     h = xp[1] - xp[0]
@@ -128,7 +133,7 @@ def bessel(
 
         if k % 2 == 1:
             dk = fd[k][i]
-            p = t_prod * (t - Decimal("0.5")) * dk
+            p = t_prod * (t - Decimal('0.5')) * dk
         else:
             dk = (fd[k][i] + fd[k][i + 1]) / 2
             t_prod = to_decimal(1)
@@ -139,4 +144,4 @@ def bessel(
 
         val += p / fact
 
-    return val if return_type == "Decimal" else np.float64(val)
+    return val if return_type == 'Decimal' else np.float64(val)

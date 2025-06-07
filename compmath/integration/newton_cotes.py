@@ -1,18 +1,19 @@
-import numpy as np
-from ..utils import to_decimal
-from typing import Union, Literal
 from decimal import Decimal, getcontext
+from typing import Literal, Union
 
+import numpy as np
+
+from ..utils import to_decimal
 
 getcontext().prec = 20
-__all__ = ["newton_cotes"]
+__all__ = ['newton_cotes']
 
 
 def newton_cotes(
     xp: np.ndarray,
     yp: np.ndarray,
     coeffs: np.ndarray = None,
-    return_type: Literal["Decimal", "float"] = "float",
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Approximate the integral of a function using the Newton–Cotes formula.
@@ -48,8 +49,10 @@ def newton_cotes(
     a, b = xp[0], xp[-1]
 
     A = np.vander(xp, increasing=True).T
-    rhs = np.array([(b ** (m + 1) - a ** (m + 1)) / (m + 1) for m in range(n + 1)])
+    rhs = np.array(
+        [(b ** (m + 1) - a ** (m + 1)) / (m + 1) for m in range(n + 1)]
+    )
     coeffs = np.linalg.solve(A, rhs)
     res = np.dot(coeffs, yp)
 
-    return np.float64(res) if return_type == "float" else to_decimal(res)
+    return np.float64(res) if return_type == 'float' else to_decimal(res)

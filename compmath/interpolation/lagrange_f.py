@@ -1,19 +1,20 @@
-import numpy as np
 from decimal import Decimal, getcontext
-from ..utils import factorial, to_decimal
-from typing import Callable, Union, Literal
-from sympy import symbols, diff, Symbol, Basic
+from typing import Callable, Literal, Union
 
+import numpy as np
+from sympy import Basic, Symbol, diff, symbols
+
+from ..utils import factorial, to_decimal
 
 getcontext().prec = 20
-__all__ = ["lagrange", "rem", "lagrange_deriv"]
+__all__ = ['lagrange', 'rem', 'lagrange_deriv']
 
 
 def lagrange(
     x: Union[Decimal, float, int, str],
     xp: np.ndarray,
     yp: np.ndarray,
-    return_type: Literal["Decimal", "float"] = "float",
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Estimate a value at a given point using Lagrange interpolation.
@@ -40,7 +41,7 @@ def lagrange(
     """
     if len(xp) < 2 or len(xp) != len(yp):
         raise ValueError(
-            "xp and yp must be the same length and contain at least two points."
+            'xp and yp must be the same length and contain at least two points.'
         )
 
     x = to_decimal(x)
@@ -58,7 +59,7 @@ def lagrange(
                 term *= num / den
         val += yp[i] * term
 
-    return np.float64(val) if return_type == "float" else to_decimal(val)
+    return np.float64(val) if return_type == 'float' else to_decimal(val)
 
 
 def rem(
@@ -67,8 +68,8 @@ def rem(
     f_deriv_at_xi: Union[Decimal, float, int, str] = None,
     f: Callable[[Symbol], Basic] = None,
     xi_val: Union[Decimal, float, int, str] = None,
-    sym: str = "x",
-    return_type: Literal["Decimal", "float"] = "float",
+    sym: str = 'x',
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Estimates the interpolation remainder (error term) at a given point for the Lagrange polynomial.
@@ -107,7 +108,7 @@ def rem(
         try:
             f_derivative = f(x_sym).diff(x_sym, n + 1)
         except Exception as e:
-            raise ValueError(f"Failed to compute the (n+1)-th derivative: {e}")
+            raise ValueError(f'Failed to compute the (n+1)-th derivative: {e}')
 
         if xi_val is None:
             xi_val = to_decimal(sum(xp)) / to_decimal(len(xp))
@@ -127,7 +128,11 @@ def rem(
     omega_at_x = omega.subs(x_sym, x)
     remainder = f_deriv_at_xi * omega_at_x / to_decimal(factorial(n + 1))
 
-    return to_decimal(remainder) if return_type == "Decimal" else np.float64(remainder)
+    return (
+        to_decimal(remainder)
+        if return_type == 'Decimal'
+        else np.float64(remainder)
+    )
 
 
 def lagrange_deriv(
@@ -135,7 +140,7 @@ def lagrange_deriv(
     k: int,
     xp: np.ndarray,
     yp: np.ndarray,
-    return_type: Literal["Decimal", "float"] = "float",
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Computes the k-th derivative of the Lagrange interpolating polynomial at a given point.
@@ -167,12 +172,12 @@ def lagrange_deriv(
     xp = to_decimal(xp)
     yp = to_decimal(yp)
 
-    x_sym = symbols("x")
+    x_sym = symbols('x')
     L = Decimal(0)
     n = len(xp)
 
     if n < 2:
-        raise ValueError("At least two points are required for interpolation.")
+        raise ValueError('At least two points are required for interpolation.')
 
     h = xp[1] - xp[0]
 
@@ -186,8 +191,8 @@ def lagrange_deriv(
     try:
         L_k = diff(L, x_sym, k)
     except Exception as e:
-        raise ValueError(f"Failed to compute the {k}-th derivative: {e}")
+        raise ValueError(f'Failed to compute the {k}-th derivative: {e}')
 
     L_k_x = L_k.subs(x_sym, x)
 
-    return np.float64(L_k_x) if return_type == "float" else to_decimal(L_k_x)
+    return np.float64(L_k_x) if return_type == 'float' else to_decimal(L_k_x)

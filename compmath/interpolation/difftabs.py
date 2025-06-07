@@ -1,7 +1,8 @@
-import numpy as np
-from ..utils import to_decimal
 from decimal import Decimal, getcontext
 
+import numpy as np
+
+from ..utils import to_decimal
 
 getcontext().prec = 20
 __all__ = ["difftabs"]

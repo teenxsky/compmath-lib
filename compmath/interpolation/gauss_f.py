@@ -1,12 +1,13 @@
-import numpy as np
-from typing import Union, Literal
-from .difftabs import difftabs
 from decimal import Decimal, getcontext
-from ..utils import factorial, to_decimal
+from typing import Literal, Union
 
+import numpy as np
+
+from ..utils import factorial, to_decimal
+from .difftabs import difftabs
 
 getcontext().prec = 20
-__all__ = ["gauss"]
+__all__ = ['gauss']
 
 
 class _Gauss:
@@ -20,7 +21,7 @@ class _Gauss:
         xp: np.ndarray,
         yp: np.ndarray,
         fd: np.ndarray = None,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Gauss forward interpolation for evenly spaced nodes.
@@ -43,12 +44,12 @@ class _Gauss:
         yp = to_decimal(yp)
 
         if len(xp) != len(yp):
-            raise ValueError("xp and yp must be of equal length.")
+            raise ValueError('xp and yp must be of equal length.')
 
         if fd is None:
             fd = difftabs.fin(yp)
         elif len(fd) != len(yp):
-            raise ValueError("fd must have the same length as yp.")
+            raise ValueError('fd must have the same length as yp.')
 
         n = len(xp) - 1
         m = n // 2
@@ -64,7 +65,7 @@ class _Gauss:
             t_prod *= (t - d) if k % 2 == 0 else (t + d)
             val += t_prod * fd[k][i] / factorial(k)
 
-        return np.float64(val) if return_type == "float" else val
+        return np.float64(val) if return_type == 'float' else val
 
     @staticmethod
     def bwd(
@@ -72,7 +73,7 @@ class _Gauss:
         xp: np.ndarray,
         yp: np.ndarray,
         fd: np.ndarray = None,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Gauss backward interpolation for evenly spaced nodes.
@@ -95,12 +96,12 @@ class _Gauss:
         yp = to_decimal(yp)
 
         if len(xp) != len(yp):
-            raise ValueError("xp and yp must be of equal length.")
+            raise ValueError('xp and yp must be of equal length.')
 
         if fd is None:
             fd = difftabs.fin(yp)
         elif len(fd) != len(yp):
-            raise ValueError("fd must have the same length as yp.")
+            raise ValueError('fd must have the same length as yp.')
 
         n = len(xp) - 1
         m = n // 2
@@ -116,7 +117,7 @@ class _Gauss:
             t_prod *= (t + d) if k % 2 == 0 else (t - d)
             val += t_prod * fd[k][i] / factorial(k)
 
-        return np.float64(val) if return_type == "float" else val
+        return np.float64(val) if return_type == 'float' else val
 
 
 gauss = _Gauss()

@@ -1,10 +1,12 @@
-import numpy as np
-from typing import Union, Literal
 from decimal import Decimal, getcontext
+from typing import Literal, Union
 
+import numpy as np
+
+from .errors import absolute_error
 
 getcontext().prec = 20
-__all__ = ["round_to"]
+__all__ = ['round_to']
 
 
 class __RoundTo:
@@ -24,16 +26,20 @@ class __RoundTo:
         """
         self._dec_number = Decimal(str(value))
         self._int_part = (
-            str(self._dec_number).split(".")[0][1:]
+            str(self._dec_number).split('.')[0][1:]
             if self._dec_number < 0
-            else str(self._dec_number).split(".")[0]
+            else str(self._dec_number).split('.')[0]
         )
         self._frac_part = (
-            str(self._dec_number).split(".")[1] if "." in str(self._dec_number) else ""
+            str(self._dec_number).split('.')[1]
+            if '.' in str(self._dec_number)
+            else ''
         )
 
     def sd(
-        self, num_digits: int = 1, return_type: Literal["Decimal", "float"] = "float"
+        self,
+        num_digits: int = 1,
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Rounds the number to the specified number of significant digits.
@@ -49,7 +55,7 @@ class __RoundTo:
           Union[Decimal, np.float64]: The rounded number.
         """
         if num_digits <= 0:
-            raise ValueError("num_digits must be greater than 0")
+            raise ValueError('num_digits must be greater than 0')
 
         round_index = 0
         significant_digits_count = 0
@@ -58,7 +64,7 @@ class __RoundTo:
                 round_index = -(len(self._int_part) - i)
                 break
 
-            if digit != "0":
+            if digit != '0':
                 significant_digits_count += 1
 
         result = (
@@ -66,13 +72,13 @@ class __RoundTo:
             if round_index <= 0
             else round(self._dec_number, round_index)
         )
-        return np.float64(result) if return_type == "float" else result
+        return np.float64(result) if return_type == 'float' else result
 
     def vd(
         self,
         abs_err: Union[Decimal, float, int, str] = None,
         num_digits: int = 1,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Rounds the number to the specified number of valid digits based on the absolute error.
@@ -89,7 +95,7 @@ class __RoundTo:
           Union[Decimal, np.float64]: The rounded number.
         """
         if num_digits <= 0:
-            raise ValueError("num_digits must be greater than 0")
+            raise ValueError('num_digits must be greater than 0')
 
         if abs_err is None:
             abs_err = absolute_error(self._dec_number)
@@ -104,7 +110,7 @@ class __RoundTo:
                 break
 
             alpha = len(self._int_part) - 2 - i
-            threshold = Decimal("5") * Decimal(10) ** Decimal(alpha)
+            threshold = Decimal('5') * Decimal(10) ** Decimal(alpha)
 
             if threshold >= abs_err:
                 valid_digits_count += 1
@@ -114,13 +120,13 @@ class __RoundTo:
             if round_index <= 0
             else round(self._dec_number, round_index)
         )
-        return np.float64(result) if return_type == "float" else result
+        return np.float64(result) if return_type == 'float' else result
 
     def dd(
         self,
         abs_err: Union[Decimal, float, int, str] = None,
         num_digits: int = 1,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Rounds the number to the specified number of doubtful digits based on the absolute error.
@@ -137,7 +143,7 @@ class __RoundTo:
           Union[Decimal, np.float64]: The rounded number.
         """
         if num_digits <= 0:
-            raise ValueError("num_digits must be greater than 0")
+            raise ValueError('num_digits must be greater than 0')
 
         if abs_err is None:
             abs_err = absolute_error(self._dec_number)
@@ -152,7 +158,7 @@ class __RoundTo:
                 break
 
             alpha = len(self._int_part) - 2 - i
-            threshold = Decimal("5") * Decimal(10) ** Decimal(alpha)
+            threshold = Decimal('5') * Decimal(10) ** Decimal(alpha)
 
             if threshold < abs_err:
                 doubtful_digits_count += 1
@@ -162,7 +168,7 @@ class __RoundTo:
             if round_index <= 0
             else round(self._dec_number, round_index)
         )
-        return np.float64(result) if return_type == "float" else result
+        return np.float64(result) if return_type == 'float' else result
 
 
 round_to = __RoundTo

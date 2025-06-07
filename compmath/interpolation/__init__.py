@@ -73,30 +73,29 @@ yp = np.array([1, 2, 0, 5], dtype=float)
 # Lagrange interpolation
 x = 1.5
 y_lagrange = lagrange(x, xp, yp)
-print(f"Lagrange interpolation at x={x}: {y_lagrange}")
+print(f'Lagrange interpolation at x={x}: {y_lagrange}')
 
 # Newton interpolation (divided differences)
 y_newton = newton.poly(x, xp, yp)
-print(f"Newton interpolation at x={x}: {y_newton}")
+print(f'Newton interpolation at x={x}: {y_newton}')
 
 # Gauss forward interpolation
 y_gauss = gauss.fwd(x, xp, yp)
-print(f"Gauss forward interpolation at x={x}: {y_gauss}")
+print(f'Gauss forward interpolation at x={x}: {y_gauss}')
 
 # Finite difference table
 fd_table = difftabs.fin(yp)
-print("Finite difference table:")
+print('Finite difference table:')
 print(fd_table)
 
 # Cubic Hermite Spline interpolation
 spline = hspline(xp, yp)
 y_spline = spline.interpolate(x)
-print(f"Cubic spline interpolation at x={x}: {y_spline}")
-"""
+print(f'Cubic spline interpolation at x={x}: {y_spline}')"""
 
-from .splain import *
-from .gauss_f import *
 from .difftabs import *
-from .newton_f import *
+from .gauss_f import *
 from .lagrange_f import *
+from .newton_f import *
 from .odd_even_f import *
+from .splain import *

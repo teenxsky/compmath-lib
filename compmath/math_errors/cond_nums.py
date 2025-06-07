@@ -1,10 +1,10 @@
-import numpy as np
 from decimal import Decimal, getcontext
-from typing import Callable, Union, Literal
+from typing import Callable, Literal, Union
 
+import numpy as np
 
 getcontext().prec = 20
-__all__ = ["cond_nums"]
+__all__ = ['cond_nums']
 
 
 class __ConditionalNumbers:
@@ -24,8 +24,8 @@ class __ConditionalNumbers:
     def __init__(
         self,
         f: Callable[[Decimal], Decimal],
-        x: Union[Decimal, float, int, str] = Decimal("1"),
-        dX: Union[Decimal, float, int, str] = Decimal("0.001"),
+        x: Union[Decimal, float, int, str] = Decimal('1'),
+        dX: Union[Decimal, float, int, str] = Decimal('0.001'),
         precision: int = 20,
     ) -> None:
         """
@@ -47,11 +47,11 @@ class __ConditionalNumbers:
         self._dX = Decimal(str(dX))
 
         if self._dX == 0:
-            raise ValueError("Parameter dX cannot be zero!")
+            raise ValueError('Parameter dX cannot be zero!')
 
         self._fX = f(self._x)
         if self._fX == 0:
-            raise ValueError("Function value f(x) cannot be zero!")
+            raise ValueError('Function value f(x) cannot be zero!')
 
         self._fXdX = f(self._x + self._dX)
 
@@ -85,7 +85,7 @@ class __ConditionalNumbers:
         getcontext().prec = precision
 
     def abs(
-        self, return_type: Literal["Decimal", "float"] = "float"
+        self, return_type: Literal['Decimal', 'float'] = 'float'
     ) -> Union[Decimal, np.float64]:
         """
         Calculates the absolute condition number using Decimal arithmetic.
@@ -97,10 +97,10 @@ class __ConditionalNumbers:
           Union[Decimal, np.float64]: The absolute condition number.
         """
         result = abs((self._fXdX - self._fX) / self._dX)
-        return result if return_type == "Decimal" else np.float64(result)
+        return result if return_type == 'Decimal' else np.float64(result)
 
     def rel(
-        self, return_type: Literal["Decimal", "float"] = "float"
+        self, return_type: Literal['Decimal', 'float'] = 'float'
     ) -> Union[Decimal, np.float64]:
         """
         Calculates the relative condition number using Decimal arithmetic.
@@ -112,7 +112,7 @@ class __ConditionalNumbers:
           Union[Decimal, np.float64]: The relative condition number.
         """
         result = abs((self._fXdX - self._fX) * self._x / (self._fX * self._dX))
-        return result if return_type == "Decimal" else np.float64(result)
+        return result if return_type == 'Decimal' else np.float64(result)
 
 
 cond_nums = __ConditionalNumbers

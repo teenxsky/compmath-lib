@@ -1,17 +1,18 @@
-import numpy as np
-from ..utils import to_decimal
-from typing import Union, Literal
 from decimal import Decimal, getcontext
+from typing import Literal, Union
 
+import numpy as np
+
+from ..utils import to_decimal
 
 getcontext().prec = 20
-__all__ = ["weddles"]
+__all__ = ['weddles']
 
 
 def weddles(
     xp: np.ndarray,
     yp: np.ndarray,
-    return_type: Literal["Decimal", "float"] = "float",
+    return_type: Literal['Decimal', 'float'] = 'float',
 ) -> Union[Decimal, np.float64]:
     """
     Approximate the integral of a function using Weddle's rule.
@@ -42,7 +43,9 @@ def weddles(
 
     n = len(xp) - 1
     if n % 6 != 0:
-        raise ValueError("Number of intervals must be divisible by 6 for Weddle's rule")
+        raise ValueError(
+            "Number of intervals must be divisible by 6 for Weddle's rule"
+        )
 
     res = to_decimal(0)
     for i in range(0, n, 6):
@@ -51,4 +54,4 @@ def weddles(
         segment = [yp[i + j] for j in range(7)]
         res += (3 * h / 10) * sum(c * y for c, y in zip(coeffs, segment))
 
-    return np.float64(res) if return_type == "float" else to_decimal(res)
+    return np.float64(res) if return_type == 'float' else to_decimal(res)

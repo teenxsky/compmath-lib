@@ -38,17 +38,17 @@ from compmath.utils import to_decimal, factorial
 # Example 1: Convert a number to Decimal
 value = 3.14159
 decimal_value = to_decimal(value)
-print(f"Decimal Value: {decimal_value}")
+print(f'Decimal Value: {decimal_value}')
 
 # Example 2: Convert a list of numbers to Decimal
 values = [1.1, 2.2, 3.3]
 decimal_values = to_decimal(values)
-print(f"Decimal Values: {decimal_values}")
+print(f'Decimal Values: {decimal_values}')
 
 # Example 3: Compute the factorial of an integer
 n = 5
 fact = factorial(n)
-print(f"Factorial of {n}: {fact}")
+print(f'Factorial of {n}: {fact}')
 """
 
 from .calc import *

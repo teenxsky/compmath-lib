@@ -1,12 +1,13 @@
-import numpy as np
-from typing import Union, Literal
-from .difftabs import difftabs
 from decimal import Decimal, getcontext
-from ..utils import factorial, to_decimal
+from typing import Literal, Union
 
+import numpy as np
+
+from ..utils import factorial, to_decimal
+from .difftabs import difftabs
 
 getcontext().prec = 20
-__all__ = ["newton"]
+__all__ = ['newton']
 
 
 class _Newton:
@@ -20,7 +21,7 @@ class _Newton:
         xp: np.ndarray,
         yp: np.ndarray,
         dd: np.ndarray = None,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Estimate value at `x` using Newton's divided differences interpolation.
@@ -43,12 +44,12 @@ class _Newton:
         yp = to_decimal(yp)
 
         if len(xp) != len(yp):
-            raise ValueError("xp and yp must be of equal length.")
+            raise ValueError('xp and yp must be of equal length.')
 
         if dd is None:
             dd = difftabs.div(xp, yp)
         elif len(dd) != len(yp):
-            raise ValueError("Length of dd must match yp.")
+            raise ValueError('Length of dd must match yp.')
 
         n = len(xp)
         x = np.atleast_1d(x)
@@ -61,7 +62,7 @@ class _Newton:
             val += term
 
         result = val[0] if val.size > 0 else val
-        return np.float64(result) if return_type == "float" else result
+        return np.float64(result) if return_type == 'float' else result
 
     @staticmethod
     def fwd(
@@ -69,7 +70,7 @@ class _Newton:
         xp: np.ndarray,
         yp: np.ndarray,
         fd: np.ndarray = None,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Estimate value at `x` using Newton's forward difference formula.
@@ -92,13 +93,13 @@ class _Newton:
         yp = to_decimal(yp)
 
         if len(xp) != len(yp):
-            raise ValueError("xp and yp must be of equal length.")
+            raise ValueError('xp and yp must be of equal length.')
 
         n = len(xp)
         if fd is None:
             fd = difftabs.fwd(yp)
         elif len(fd) != n:
-            raise ValueError("fd must have the same length as yp.")
+            raise ValueError('fd must have the same length as yp.')
 
         h = xp[1] - xp[0]
         t = (x - xp[0]) / h
@@ -110,7 +111,7 @@ class _Newton:
             t_prod *= t - (i - 1)
             val += t_prod * fd[i] / factorial(i)
 
-        return np.float64(val) if return_type == "float" else val
+        return np.float64(val) if return_type == 'float' else val
 
     @staticmethod
     def bwd(
@@ -118,7 +119,7 @@ class _Newton:
         xp: np.ndarray,
         yp: np.ndarray,
         bd: np.ndarray = None,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Estimate value at `x` using Newton's backward difference formula.
@@ -141,13 +142,13 @@ class _Newton:
         yp = to_decimal(yp)
 
         if len(xp) != len(yp):
-            raise ValueError("xp and yp must be of equal length.")
+            raise ValueError('xp and yp must be of equal length.')
 
         n = len(xp)
         if bd is None:
             bd = difftabs.bwd(yp)
         elif len(bd) != n:
-            raise ValueError("bd must have the same length as yp.")
+            raise ValueError('bd must have the same length as yp.')
 
         h = xp[1] - xp[0]
         t = (x - xp[-1]) / h * -1
@@ -159,7 +160,7 @@ class _Newton:
             t_prod *= t - (i - 1)
             val += ((-1) ** i) * t_prod * bd[i] / factorial(i)
 
-        return np.float64(val) if return_type == "float" else val
+        return np.float64(val) if return_type == 'float' else val
 
 
 newton = _Newton()

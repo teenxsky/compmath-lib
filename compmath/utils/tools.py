@@ -1,9 +1,9 @@
-import numpy as np
-from typing import Union
 from decimal import Decimal
+from typing import Union
 
+import numpy as np
 
-__all__ = ["to_decimal"]
+__all__ = ['to_decimal']
 
 
 def to_decimal(
@@ -19,5 +19,6 @@ def to_decimal(
         Decimal or np.ndarray: Converted decimal(s).
     """
     if isinstance(obj, list) or isinstance(obj, np.ndarray):
-        return np.array([Decimal(str(x)) for x in obj], dtype=Decimal)
+        decimal_list = [Decimal(str(x)) for x in obj]
+        return np.array(decimal_list, dtype=object)
     return Decimal(str(obj))

@@ -46,12 +46,17 @@ Features:
   - Requires the number of intervals to be divisible by 6.
   - Very accurate for well-behaved functions.
 
+- **Gaussian Quadrature**:
+  - Implements Gaussian quadrature for high-precision integration.
+  - Uses Chebyshev nodes for optimal polynomial approximation.
+
 Modules:
 --------
 - `basic`: Contains rectangle, midpoint, and trapezoidal rules.
 - `simpson`: Implements Simpson’s 1/3 and 3/8 rules.
 - `newton_cotes`: Defines a general Newton–Cotes integration method.
 - `weddle`: Implements Weddle’s rule for degree-6 interpolation.
+- `gauss`: Implements Gaussian quadrature for high-precision integration.
 
 Usage:
 ------
@@ -69,13 +74,18 @@ xp = np.array([0, 0.5, 1.0])
 yp = np.array([1, 1.25, 1.5])  # Example f(x) = 1 + 0.5x
 
 # Apply different integration methods
-print("Rectangle rule:", rectangle(xp, yp, method="left"))
-print("Trapezoidal rule:", trapezoid(xp, yp))
+print('Rectangle rule:', rectangle(xp, yp, method='left'))
+print('Trapezoidal rule:', trapezoid(xp, yp))
 print("Simpson's 1/3 rule:", simpson.quad(xp, yp))
-print("Weddle’s rule (requires 7 points):", weddles(np.linspace(0, 6, 7), np.sin(np.linspace(0, 6, 7))))
+print(
+    'Weddle’s rule (requires 7 points):',
+    weddles(np.linspace(0, 6, 7), np.sin(np.linspace(0, 6, 7))),
+)
+print('Gaussian quadrature:', gauss(xp, yp))
 """
 
 from .basic import *
-from .weddle import *
-from .simpson import *
+from .gauss import *
 from .newton_cotes import *
+from .simpson import *
+from .weddle import *

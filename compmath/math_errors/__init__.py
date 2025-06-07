@@ -49,40 +49,50 @@ where numerical accuracy is critical.
 Example:
 --------
 ```python
-from compmath.math_errors import absolute_error, relative_error, round_to, digits_analysis, cond_nums, ApproxNum
+from compmath.math_errors import (
+    absolute_error,
+    relative_error,
+    round_to,
+    digits_analysis,
+    cond_nums,
+    ApproxNum,
+)
 
 # Example 1: Calculate absolute and relative errors
 value = 3.14159
 exact_value = 3.14
 abs_err = absolute_error(value, exact_value)
 rel_err = relative_error(value, exact_value)
-print(f"Absolute Error: {abs_err}, Relative Error: {rel_err}")
+print(f'Absolute Error: {abs_err}, Relative Error: {rel_err}')
 
 # Example 2: Round to significant digits
 rounded_value = round_to(3.14159).sd(num_digits=3)
-print(f"Rounded to 3 significant digits: {rounded_value}")
+print(f'Rounded to 3 significant digits: {rounded_value}')
 
 # Example 3: Analyze digits
 analysis = digits_analysis(3.14159)
 significant_digits = analysis.sd()
-print(f"Significant Digits: {significant_digits}")
+print(f'Significant Digits: {significant_digits}')
+
 
 # Example 4: Compute condition numbers
 def f(x):
     return x**2
 
+
 condition = cond_nums(f, x=2)
 abs_cond = condition.abs()
 rel_cond = condition.rel()
-print(f"Absolute Condition Number: {abs_cond}, Relative Condition Number: {rel_cond}")
+print(
+    f'Absolute Condition Number: {abs_cond}, Relative Condition Number: {rel_cond}'
+)
 
 # Example 5: Work with approximate numbers
 approx = ApproxNum(3.14159, abs_err=0.001)
-print(f"Approximate Number: {approx}")
-"""
+print(f'Approximate Number: {approx}')"""
 
-from .round import *
-from .errors import *
-from .cond_nums import *
 from .approx_num import *
+from .cond_nums import *
 from .digits_analysis import *
+from .errors import *
+from .round import *

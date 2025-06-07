@@ -1,10 +1,9 @@
 import numpy as np
 
+__all__ = ['factorial']
 
-__all__ = ["factorial"]
 
-
-def factorial(value: int) -> int:
+def factorial(value: int) -> np.int64:
     """
     Calculate the factorial of a given integer.
 

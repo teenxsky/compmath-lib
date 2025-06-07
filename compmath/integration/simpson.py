@@ -1,11 +1,12 @@
-import numpy as np
-from ..utils import to_decimal
-from typing import Union, Literal
 from decimal import Decimal, getcontext
+from typing import Literal, Union
 
+import numpy as np
+
+from ..utils import to_decimal
 
 getcontext().prec = 20
-__all__ = ["simpson"]
+__all__ = ['simpson']
 
 
 class __Simpson:
@@ -23,7 +24,7 @@ class __Simpson:
     def quad(
         xp: np.ndarray,
         yp: np.ndarray,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Approximate the integral of a function using Simpson's 1/3 rule.
@@ -53,19 +54,21 @@ class __Simpson:
 
         n = len(xp) - 1
         if n % 2 != 0:
-            raise ValueError("Number of intervals must be even for Simpson's rule")
+            raise ValueError(
+                "Number of intervals must be even for Simpson's rule"
+            )
         res = to_decimal(0)
         for i in range(0, n, 2):
             h = xp[i + 2] - xp[i]
             res += (h / 6) * (yp[i] + 4 * yp[i + 1] + yp[i + 2])
 
-        return np.float64(res) if return_type == "float" else to_decimal(res)
+        return np.float64(res) if return_type == 'float' else to_decimal(res)
 
     @staticmethod
     def cubic(
         xp: np.ndarray,
         yp: np.ndarray,
-        return_type: Literal["Decimal", "float"] = "float",
+        return_type: Literal['Decimal', 'float'] = 'float',
     ) -> Union[Decimal, np.float64]:
         """
         Approximate the integral of a function using Simpson's 3/8 rule.
@@ -101,9 +104,11 @@ class __Simpson:
         res = to_decimal(0)
         for i in range(0, n, 3):
             h = (xp[i + 3] - xp[i]) / 3
-            res += (3 * h / 8) * (yp[i] + 3 * yp[i + 1] + 3 * yp[i + 2] + yp[i + 3])
+            res += (3 * h / 8) * (
+                yp[i] + 3 * yp[i + 1] + 3 * yp[i + 2] + yp[i + 3]
+            )
 
-        return np.float64(res) if return_type == "float" else to_decimal(res)
+        return np.float64(res) if return_type == 'float' else to_decimal(res)
 
 
 simpson = __Simpson()
